@@ -2,12 +2,28 @@ var request = require('request');
 
 var url = 'https://www.mercadobitcoin.net/api/ticker/'
 
-request(url, function(error, response, json){
+var listValues = [];
+var waitSeconds = 60;
 
-  if (!error) {
-    console.log(json);
+setInterval(function() {
+  request(url, function(error, response, json){
+
+    if (!error) {
+      var bitcoinValues = JSON.parse(json);
+      addLastPrice(bitcoinValues.ticker)
+    }
+    else {
+      console.log(error);
+    }
+  })
+}, 1000 * waitSeconds);
+
+function addLastPrice(ticker) {
+  listValues.push(ticker.last);
+
+  if (listValues.length > 10) {
+    listValues.shift();
   }
-  else {
-    console.log(error);
-  }
-})
+
+  console.log(listValues);
+}
